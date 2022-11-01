@@ -1,4 +1,17 @@
+/* body {
+    background-color: gray;
+  }
+  div {
+    background-image: url('file:///C:/Users/gupta/OneDrive/Desktop/EZTrade/Website/Static/Plant.jpg');
+    height: 70px;
+    width: 83px;
+  } */
 
-.body{
-    background-image: url('/Plant.png');
+  
+body{
+    border: 2px solid black;
+    padding: 25px;
+    background: url("https://u4d2z7k9.rocketcdn.me/wp-content/uploads/2022/08/Untitled-1024-%C3%97-683px-2022-08-09T104031.356.jpg.webp");
+    background-repeat: no-repeat;
+    background-size: auto;
 }
