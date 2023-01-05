@@ -2,6 +2,10 @@
 from tkinter import *
 from tkinter import messagebox
 import pickle
+import ImportData as ID
+from matplotlib import *
+from matplotlib.figure import*
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
 class listObject():
     def __init__(self, name1, password1, balance1):
@@ -39,22 +43,29 @@ except OSError as e:
     pass
 pickleFileOut = open('database.pickle', 'wb')
 
+
+
+
+
+
+
 def saveDataOnExit():
     pickle.dump(classList, pickleFileOut)
     pickleFileOut.close()
     window.destroy()
 
 window.protocol('WM_DELETE_WINDOW', saveDataOnExit) # root is your root window
+window.resizable(True, True)
 
 def mainWindow():
     clearWindow()
     window.title("Welcome to EZTrade")
-    window.geometry('100x350')
-    btn1 = Button(window, text = "Sign in", command = signIn)
-    btn2 = Button(window, text = "Add account", command = addAccount)
-    btn3 = Button(window, text = "Delete account", command = deleteAccount)
-    btn4 = Button(window, text = "Show accounts", command = showAccount)
-    btn5 = Button(window, text = "Delete all accounts", command = destroyAll)
+    window.geometry('500x500')
+    btn1 = Button(window, text = "Sign in", command = signIn, height=5, width=25)
+    btn2 = Button(window, text = "Add account", command = addAccount, height=5, width=25)
+    btn3 = Button(window, text = "Delete account", command = deleteAccount,height=5, width=25)
+    btn4 = Button(window, text = "Show accounts", command = showAccount,height=5, width=25)
+    btn5 = Button(window, text = "Delete all accounts", command = destroyAll,height=5, width=25)
     btn1.grid(column=0, row=0)
     btn2.grid(column=0, row=1)
     btn3.grid(column=0, row=2)
@@ -62,7 +73,6 @@ def mainWindow():
     btn5.grid(column=0, row=4)
 
 def deleteAccount():
-    print("Working?")
     clearWindow()
     lbl = Label(window, text = "Enter the username you want to delete:")
     txt = Entry(window, width=20)
@@ -114,6 +124,59 @@ def signIn():
     button.grid(column=2, row=1)
     btn = Button(window, text="Main menu", command=mainWindow)
     btn.grid(column=1, row=2)
+
+
+def plot():
+    # the figure that will contain the plot
+    fig = Figure(figsize = (5, 5), dpi = 100)
+    # list of squares
+    y = [i**2 for i in range(101)]
+    # adding the subplot
+    plot1 = fig.add_subplot(111)
+    # plotting the graph
+    plot1.plot(y)
+    # creating the Tkinter canvas
+    # containing the Matplotlib figure
+    canvas = FigureCanvasTkAgg(fig, master = window)  
+    canvas.draw()
+    # placing the canvas on the Tkinter window
+    canvas.get_tk_widget().pack()
+    # creating the Matplotlib toolbar
+    toolbar = NavigationToolbar2Tk(canvas, window)
+    toolbar.update()
+    # placing the toolbar on the Tkinter window
+    canvas.get_tk_widget().pack()
+
+
+def animate_graph_market(stock):
+    pd = ID.get_stock_data(symbols=stock.name)
+
+
+
+def animate_graph_user(stock):
+    pd = ID.get_stock_data(symbols=stock.name)
+
+
+
+
+def showStocks(username):
+    user = classList[username]
+    clearWindow()
+    stock_buttons = []
+    i = 0
+    for stock in user.portfolio:
+        button = Button(window, text=stock.name, command=lambda:showStock(stock))
+        button.grid(column=0, row=i)
+        stock_buttons.append(button)
+        i+=1
+    
+
+    
+def showStock(stock):
+
+
+
+
 
 def signedIn(username, password):
     if(len(classList)==0):
