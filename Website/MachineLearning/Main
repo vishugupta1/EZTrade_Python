@@ -1,0 +1,89 @@
+
+from datetime import datetime
+from StrategyLearner import StrategyLearner
+import ImportData as ID
+from distutils.command.sdist import sdist
+from tracemalloc import start
+import robin_stocks.robinhood as rh
+import pyotp
+import yfinance as yf
+import datetime as dt
+import pandas as pd
+import threading
+
+models = {}
+
+class stock(object):
+    def __init__(self, cq = 0, bp = 0, sym = "JPM"):  		  	   		  	  			  		 			 	 	 		 		 	 		 		 	 		  	 	 			  	 		  	   		  	  			  		 			 	 	 		 		 	 		 		 	 		  	 	 			  	 
+        self.current_quantity = cq
+        self.buy_percentage = bp
+        self.ticker = sym
+        self.sl = None
+
+    def create_new_model(self, symbol):
+        self.sl = StrategyLearner()
+        current_date = datetime.now()
+        self.sl.add_evidence(symbol=self.ticker, ed = current_date)
+
+    def update_model(self):
+        current_date = datetime.now()
+        self.sl.add_evidence(symbol=self.ticker, ed = current_date)
+
+    def run_model(self):
+        current_date = datetime.now()
+        self.sl.testPolicy(symbol=self.ticker, ed=current_date)
+
+
+class user(object):
+    def __init__(self):  		  	   		  	  			  		 			 	 	 		 		 	 		 		 	 		  	 	 			  	 		  	   		  	  			  		 			 	 	 		 		 	 		 		 	 		  	 	 			  	 
+        self.portfolio = {}
+        self.liquid_cash = 0
+        self.password = ""
+        self.token = ""
+        self.username = ""
+        self.email = ""
+
+    def add_stock(self, symb="JPM"):
+        stock_obj = stock()
+        self.portfolio[symb] = stock_obj
+
+    def trigger_action(self, symb="JPM"):
+        stock = self.portfolio[symb]
+        trade_decisions = stock.testpolicy()
+        current_stock_price = rh.get_latest_price(inputSymbols=symb)
+        num_of_shares = (self.liquid_cash*(.01*stock.buy_percentage))/current_stock_price
+        current_trade_decision = trade_decisions[-1]
+        if(current_trade_decision == 1):
+            return
+        elif(current_trade_decision == 0):
+            return
+        elif(current_trade_decision == -1):
+            return
+
+        rh.order(symbol=symb, quantity = num_of_shares, limitPrice=None, stopPrice=None, timeInForce='gtc', extendedHours=False, jsonify=True)
+
+    def launch_actors(self):
+        actors = []
+        for key,value in self.portfolio:
+            temp = threading.Thread(target=self.trigger_action, args=(key,))
+            actors.append(temp)
+            temp.start()
+        for actor in actors:
+            actor.join()
+
+
+    def update(self):
+        totp  = pyotp.TOTP(self.token).now()
+        my_stocks = ID.get_user_info(email=self.email, password=self.password, otp=totp)
+        for key,value in my_stocks:
+            if key in self.portfolio:
+                return
+            else:
+                temp_stock = stock(sym = key)
+                self.portfolio[key] = temp_stock
+
+
+
+
+if __name__ == '__main__':
+    

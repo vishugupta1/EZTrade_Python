@@ -5,9 +5,9 @@ Home
 {% endblock %}
 
 {% block content %}
-<h1 align="center">Notes</h1>
-<ul class="list-group list-group-flush" id="notes">
-    {% for note in user.notes %}
+<h1 align="center">Stocks</h1>
+<ul class="list-group list-group-flush" id="stocks">
+    {% for stock in user.stocks %}
     <li class="list-group-item">{{note.data}}
         <button type="button" class="close" onclick="deleteNote({{note.id}})">
             <span aria-hidden="true">&times;</span>
@@ -23,5 +23,7 @@ Home
     </div>
 </form>
 {% endblock %}
+
+
 
 
